@@ -928,4 +928,13 @@
   // Keyboard navigation
   document.addEventListener('keydown', e => {
     if (!lb.classList.contains('active')) return;
-    if 
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowRight') showNext();
+    if (e.key === 'ArrowLeft') showPrev();
+  });
+
+  lbImg.style.transition = 'opacity .2s ease';
+</script>
+
+</body>
+</html>
