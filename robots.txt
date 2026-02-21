@@ -1,0 +1,100 @@
+# robots.txt for hilaryklein.com
+# Generated for Hilary Klein — Artist Portfolio
+# Last updated: 2024
+
+# ── ALLOW legitimate search engines ──────────────────
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+# ── BLOCK known AI training crawlers ─────────────────
+
+# OpenAI / ChatGPT
+User-agent: GPTBot
+Disallow: /
+
+# OpenAI research crawler
+User-agent: ChatGPT-User
+Disallow: /
+
+# Google AI / Gemini training
+User-agent: Google-Extended
+Disallow: /
+
+# Common Crawl (feeds many AI training datasets)
+User-agent: CCBot
+Disallow: /
+
+# Anthropic
+User-agent: anthropic-ai
+Disallow: /
+
+# Claude
+User-agent: Claude-Web
+Disallow: /
+
+# Meta / Facebook AI
+User-agent: FacebookBot
+Disallow: /
+
+# Meta external agent
+User-agent: meta-externalagent
+Disallow: /
+
+# Apple Applebot (used for Apple Intelligence)
+User-agent: Applebot-Extended
+Disallow: /
+
+# Amazon Alexa / AI crawlers
+User-agent: Amazonbot
+Disallow: /
+
+# Cohere AI
+User-agent: cohere-ai
+Disallow: /
+
+# ByteDance / TikTok
+User-agent: Bytespider
+Disallow: /
+
+# Diffbot (AI data extraction)
+User-agent: Diffbot
+Disallow: /
+
+# ImagesiftBot (image scraping)
+User-agent: ImagesiftBot
+Disallow: /
+
+# omgili / Webz.io data mining
+User-agent: omgili
+Disallow: /
+
+User-agent: omgilibot
+Disallow: /
+
+# DataForSeoBot
+User-agent: DataForSeoBot
+Disallow: /
+
+# PetalBot (Huawei AI)
+User-agent: PetalBot
+Disallow: /
+
+# Scrapy (common scraping framework)
+User-agent: Scrapy
+Disallow: /
+
+# ── BLOCK all unrecognized bots from images ───────────
+# This protects your artwork specifically
+User-agent: *
+Disallow: /images/
+Disallow: /paintings/
+Disallow: /gallery/
+
+# ── SITEMAP (helps legitimate search engines) ─────────
+Sitemap: https://www.hilaryklein.com/sitemap.xml
