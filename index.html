@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hilary Klein — Artist</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Cinzel:wght@400;600&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --purple:    #1E0A2E;
+    --purple-mid:#2D1248;
+    --purple-light: #4A1F6E;
+    --gold:      #F5C400;
+    --gold-soft: #E8A820;
+    --cyan:      #00D4C8;
+    --red:       #C8001A;
+    --orange:    #E8650A;
+    --cream:     #FDF6E8;
+    --cream-dim: rgba(253,246,232,0.7);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--purple);
+    color: var(--cream);
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  /* ── NAV ───────────────────────────────────────── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 1.5rem 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(to bottom, rgba(30,10,46,0.95), transparent);
+  }
+
+  .nav-logo {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    letter-spacing: 0.25em;
+    color: var(--gold);
+    text-transform: uppercase;
+    text-decoration: none;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 2.5rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(253,246,232,0.6);
+    text-decoration: none;
+    transition: color .25s;
+  }
+
+  .nav-links a:hover { color: var(--cyan); }
+
+  /* ── HERO ──────────────────────────────────────── */
+  .hero {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    min-height: 650px;
+    overflow: hidden;
+    display: flex;
+    align-items: flex-end;
+    padding-bottom: 8rem;
+  }
+
+  .hero-image {
+    position: absolute;
+    inset: 0;
+    background: url('painting2.jpg') center center / cover no-repeat;
+    filter: saturate(1.1) brightness(0.55);
+    transform: scale(1.03);
+    animation: slowZoom 20s ease-in-out infinite alternate;
+  }
+
+  /* gradient overlay — deeper at bottom for text readability */
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(to right, rgba(30,10,46,0.82) 0%, rgba(30,10,46,0.2) 60%, transparent 100%),
+      linear-gradient(to top, rgba(30,10,46,0.95) 0%, transparent 55%);
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    padding: 0 4rem;
+    max-width: 700px;
+  }
+
+  .hero-eyebrow {
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+    font-size: 0.7rem;
+    letter-spacing: 0.45em;
+    text-transform: uppercase;
+    color: var(--cyan);
+    margin-bottom: 1.2rem;
+    opacity: 0;
+    animation: fadeUp .9s .3s ease forwards;
+  }
+
+  .hero-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: clamp(4rem, 9vw, 9rem);
+    line-height: 0.9;
+    letter-spacing: -0.01em;
+    color: var(--cream);
+    opacity: 0;
+    animation: fadeUp .9s .55s ease forwards;
+  }
+
+  .hero-name em {
+    font-style: italic;
+    color: var(--gold);
+    display: block;
+  }
+
+  .hero-tagline {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: clamp(1.1rem, 2vw, 1.5rem);
+    color: var(--cream-dim);
+    margin-top: 1.8rem;
+    line-height: 1.6;
+    max-width: 480px;
+    opacity: 0;
+    animation: fadeUp .9s .8s ease forwards;
+  }
+
+  .hero-btn {
+    display: inline-block;
+    margin-top: 2.5rem;
+    padding: 0.85rem 2.8rem;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background .3s, color .3s;
+    opacity: 0;
+    animation: fadeUp .9s 1s ease forwards;
+  }
+
+  .hero-btn:hover {
+    background: var(--gold);
+    color: var(--purple);
+  }
+
+  /* scroll cue */
+  .scroll-cue {
+    position: absolute;
+    bottom: 2rem;
+    right: 3rem;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .4rem;
+    opacity: 0;
+    animation: fadeIn 1s 1.4s ease forwards;
+  }
+
+  .scroll-cue span {
+    font-size: 0.55rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(253,246,232,.35);
+    writing-mode: vertical-rl;
+  }
+
+  .scroll-line {
+    width: 1px;
+    height: 60px;
+    background: linear-gradient(to bottom, rgba(245,196,0,0.6), transparent);
+    animation: pulse 2s 1.6s ease-in-out infinite;
+  }
+
+  /* ── ABOUT STRIP ───────────────────────────────── */
+  .about-strip {
+    background: var(--purple-mid);
+    padding: 6rem 4rem;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 5rem;
+    align-items: center;
+    max-width: 1300px;
+    margin: 0 auto;
+  }
+
+  .about-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1rem;
+  }
+
+  .about-heading {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: clamp(2.5rem, 4vw, 4rem);
+    line-height: 1.05;
+    color: var(--cream);
+  }
+
+  .about-heading em { font-style: italic; color: var(--cyan); }
+
+  .about-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: clamp(1.1rem, 1.6vw, 1.3rem);
+    line-height: 1.9;
+    color: var(--cream-dim);
+  }
+
+  .about-text p + p { margin-top: 1.2rem; }
+
+  /* ── GALLERY SECTION ───────────────────────────── */
+  .gallery-section {
+    padding: 7rem 3rem;
+    background: var(--purple);
+    position: relative;
+  }
+
+  .gallery-section::before {
+    content: '';
+    display: block;
+    width: 80px;
+    height: 2px;
+    background: var(--gold);
+    margin: 0 auto 1.5rem;
+  }
+
+  .section-title {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.45em;
+    text-transform: uppercase;
+    color: var(--gold);
+    text-align: center;
+    margin-bottom: 0.6rem;
+  }
+
+  .section-heading {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: clamp(2.8rem, 5vw, 5rem);
+    text-align: center;
+    color: var(--cream);
+    margin-bottom: 1.2rem;
+    line-height: 1;
+  }
+
+  .section-heading em { font-style: italic; color: var(--cyan); }
+
+  .section-intro {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: clamp(1rem, 1.5vw, 1.2rem);
+    color: var(--cream-dim);
+    text-align: center;
+    max-width: 650px;
+    margin: 0 auto 4.5rem;
+    line-height: 1.85;
+  }
+
+  /* ── MOSAIC ─────────────────────────────────────── */
+  .mosaic {
+    display: grid;
+    max-width: 1300px;
+    margin: 0 auto;
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: 320px;
+    gap: 14px;
+  }
+
+  /* varied spans for visual interest */
+  .tile:nth-child(1) { grid-column: span 2; grid-row: span 2; }
+  .tile:nth-child(4) { grid-column: span 2; }
+  .tile:nth-child(7) { grid-column: span 2; }
+  .tile:nth-child(8) { grid-column: span 2; }
+
+  .tile {
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    border: 1px solid rgba(245,196,0,0.1);
+  }
+
+  .tile img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform .6s cubic-bezier(.16,1,.3,1), filter .4s ease;
+    filter: saturate(0.85) brightness(0.9);
+  }
+
+  .tile:hover img {
+    transform: scale(1.06);
+    filter: saturate(1.1) brightness(1);
+  }
+
+  .tile-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(30,10,46,0.85) 0%, transparent 50%);
+    opacity: 0;
+    transition: opacity .35s ease;
+    display: flex;
+    align-items: flex-end;
+    padding: 1.5rem;
+  }
+
+  .tile:hover .tile-overlay { opacity: 1; }
+
+  .tile-info {
+    transform: translateY(8px);
+    transition: transform .35s ease;
+  }
+
+  .tile:hover .tile-info { transform: none; }
+
+  .tile-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1.2rem;
+    color: var(--cream);
+    display: block;
+    margin-bottom: 0.2rem;
+  }
+
+  .tile-meta {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  /* zoom icon */
+  .tile-zoom {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 36px;
+    height: 36px;
+    background: rgba(245,196,0,0.9);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: scale(0.7);
+    transition: opacity .3s ease, transform .3s ease;
+    color: var(--purple);
+    font-size: 1rem;
+  }
+
+  .tile:hover .tile-zoom {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  /* ── BELOW GALLERY TEXT ─────────────────────────── */
+  .gallery-footer-text {
+    max-width: 700px;
+    margin: 5rem auto 0;
+    text-align: center;
+  }
+
+  .gallery-footer-text p {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: clamp(1rem, 1.5vw, 1.2rem);
+    line-height: 1.9;
+    color: var(--cream-dim);
+    margin-bottom: 1.2rem;
+  }
+
+  .ornament {
+    color: var(--gold);
+    font-size: 1.4rem;
+    display: block;
+    text-align: center;
+    margin: 2.5rem 0;
+    letter-spacing: 0.5em;
+    opacity: 0.6;
+  }
+
+  /* ── LIGHTBOX ───────────────────────────────────── */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(10,4,18,0.97);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .4s ease;
+    backdrop-filter: blur(8px);
+  }
+
+  .lightbox.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .lightbox-inner {
+    position: relative;
+    max-width: 92vw;
+    max-height: 92vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .lightbox img {
+    max-width: 92vw;
+    max-height: 88vh;
+    object-fit: contain;
+    border: 1px solid rgba(245,196,0,0.2);
+    transform: scale(0.92);
+    transition: transform .4s cubic-bezier(.16,1,.3,1);
+    box-shadow: 0 30px 100px rgba(0,0,0,0.8);
+  }
+
+  .lightbox.active img { transform: scale(1); }
+
+  .lightbox-close {
+    position: absolute;
+    top: -3rem;
+    right: 0;
+    background: none;
+    border: 1px solid rgba(245,196,0,0.4);
+    color: var(--gold);
+    font-size: 1rem;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .2s;
+    font-family: 'Lato', sans-serif;
+  }
+
+  .lightbox-close:hover { background: rgba(245,196,0,0.15); }
+
+  .lightbox-caption {
+    position: absolute;
+    bottom: -2.5rem;
+    left: 0;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1rem;
+    color: var(--cream-dim);
+  }
+
+  /* nav arrows */
+  .lb-prev, .lb-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(245,196,0,0.1);
+    border: 1px solid rgba(245,196,0,0.3);
+    color: var(--gold);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .2s;
+  }
+
+  .lb-prev { left: -4rem; }
+  .lb-next { right: -4rem; }
+  .lb-prev:hover, .lb-next:hover { background: rgba(245,196,0,0.25); }
+
+  /* ── FOOTER ─────────────────────────────────────── */
+  footer {
+    background: var(--purple-mid);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .footer-glow {
+    position: absolute;
+    top: -40%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 400px;
+    background: radial-gradient(ellipse, rgba(0,212,200,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .footer-main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 7rem 3rem 4rem;
+    text-align: center;
+    position: relative;
+  }
+
+  .footer-label {
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+    font-size: 0.65rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--cyan);
+    margin-bottom: 1.2rem;
+  }
+
+  .footer-heading {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    line-height: 1.1;
+    color: var(--cream);
+    margin-bottom: 1.5rem;
+  }
+
+  .footer-heading em { font-style: italic; color: var(--gold); }
+
+  .footer-body {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1.15rem;
+    color: var(--cream-dim);
+    line-height: 1.8;
+    margin-bottom: 3rem;
+  }
+
+  .footer-email {
+    display: inline-block;
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+    font-size: 0.75rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(245,196,0,0.35);
+    padding-bottom: 2px;
+    transition: color .2s, border-color .2s;
+  }
+
+  .footer-email:hover { color: var(--cyan); border-color: var(--cyan); }
+
+  .footer-divider {
+    width: 60px;
+    height: 1px;
+    background: rgba(245,196,0,0.3);
+    margin: 4rem auto;
+  }
+
+  .footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 0 3rem 3rem;
+    max-width: 1300px;
+    margin: 0 auto;
+  }
+
+  .footer-sig {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1.4rem;
+    color: rgba(253,246,232,0.4);
+  }
+
+  .footer-nav {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+  }
+
+  .footer-nav a {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(253,246,232,0.3);
+    text-decoration: none;
+    transition: color .2s;
+  }
+
+  .footer-nav a:hover { color: var(--gold); }
+
+  .footer-copy {
+    font-size: 0.6rem;
+    color: rgba(253,246,232,0.2);
+    letter-spacing: 0.1em;
+  }
+
+  /* ── ANIMATIONS ─────────────────────────────────── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(28px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes slowZoom {
+    from { transform: scale(1.03); }
+    to   { transform: scale(1.10); }
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 0.3; }
+    50%       { opacity: 1; }
+  }
+
+  /* ── RESPONSIVE ─────────────────────────────────── */
+  @media (max-width: 900px) {
+    nav { padding: 1.2rem 1.5rem; }
+    .hero-content { padding: 0 2rem; }
+    .about-strip { grid-template-columns: 1fr; gap: 2rem; padding: 4rem 2rem; }
+    .mosaic {
+      grid-template-columns: repeat(2, 1fr);
+      grid-auto-rows: 240px;
+    }
+    .tile:nth-child(1) { grid-column: span 2; grid-row: span 1; }
+    .tile:nth-child(4) { grid-column: span 1; }
+    .tile:nth-child(7) { grid-column: span 1; }
+    .tile:nth-child(8) { grid-column: span 1; }
+    .lb-prev { left: -2rem; }
+    .lb-next { right: -2rem; }
+    .footer-bottom { padding: 0 1.5rem 2rem; flex-direction: column; align-items: flex-start; }
+  }
+
+  @media (max-width: 580px) {
+    .mosaic { grid-template-columns: 1fr; grid-auto-rows: 280px; }
+    .tile:nth-child(1) { grid-column: span 1; }
+    .nav-links { display: none; }
+    .gallery-section { padding: 5rem 1.2rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+  <a href="#" class="nav-logo">Hilary Klein</a>
+  <ul class="nav-links">
+    <li><a href="#gallery">Gallery</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-image"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <p class="hero-eyebrow">Acrylic · Psychedelic · Southwest</p>
+    <h1 class="hero-name">
+      Hilary
+      <em>Klein</em>
+    </h1>
+    <p class="hero-tagline">Paintings that move between worlds — where desert creatures carry the sacred and the strange.</p>
+    <a href="#gallery" class="hero-btn">View the Work</a>
+  </div>
+  <div class="scroll-cue">
+    <div class="scroll-line"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<!-- ── ABOUT ── -->
+<section id="about" style="background: var(--purple-mid);">
+  <div class="about-strip">
+    <div>
+      <p class="about-label">About the Artist</p>
+      <h2 class="about-heading">Visions from the <em>High Desert</em></h2>
+    </div>
+    <div class="about-text">
+      <p>Based in Silver City, New Mexico, Hilary Klein paints the living world of the Southwest through a psychedelic lens — jackrabbits and coyotes, bumblebees and beetles, rendered in swirling acrylics that pulse with color and sacred energy.</p>
+      <p>Each painting is a portal. Animals appear not merely as creatures but as spirit guides, each outlined in glowing neon against fields of deep purple, burning red, and desert gold. The work asks you to look twice — and then to keep looking.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── GALLERY ── -->
+<section class="gallery-section" id="gallery">
+  <p class="section-title">Selected Works</p>
+  <h2 class="section-heading">The <em>Collection</em></h2>
+  <p class="section-intro">
+    Each painting is an encounter with the living Southwest — its animals, its light, its ancient strangeness. Click any work to view it full size.
+  </p>
+
+  <div class="mosaic" id="mosaic">
+
+    <div class="tile" data-src="wm_bewareofsharpobjecgts.jpg" data-title="Beware of Sharp Objects" data-index="0">
+      <img src="wm_bewareofsharpobjecgts.jpg" alt="Beware of Sharp Objects — Hilary Klein">
+      <div class="tile-overlay">
+        <div class="tile-info">
+          <span class="tile-name">Beware of Sharp Objects</span>
+          <span class="tile-meta">Acrylic on Canvas</span>
+        </div>
+      </div>
+      <div class="tile-zoom">⊕</div>
+    </div>
+
+    <div class="tile" data-src="wm_coyote-red-sky.jpg" data-title="Coyote Red Sky" data-index="1">
+      <img src="wm_coyote-red-sky.jpg" alt="Coyote Red Sky — Hilary Klein">
+      <div class="tile-overlay">
+        <div class="tile-info">
+          <span class="tile-name">Coyote Red Sky</span>
+          <span class="tile-meta">Acrylic on Canvas</span>
+        </div>
+      </div>
+      <div class="tile-zoom">⊕</div>
+    </div>
+
+    <div class="tile" data-src="wm_bunny-in-red-sky.jpg" data-title="Bunny in Red Sky" data-index="2">
+      <img src="wm_bunny-in-red-sky.jpg" alt="Bunny in Red Sky — Hilary Klein">
+      <div class="tile-overlay">
+        <div class="tile-info">
+          <span class="tile-name">Bunny in Red Sky</span>
+          <span class="tile-meta">Acrylic on Canvas</span>
+        </div>
+      </div>
+      <div class="tile-zoom">⊕</div>
+    </div>
+
+    <div class="tile" data-src="wm_hummingbird.jpg" data-title="Hummingbird" data-index="3">
+      <img src="wm_hummingbird.jpg" alt="Hummingbird — Hilary Klein">
+      <div class="tile-overlay">
+        <div class="tile-info">
+          <span class="tile-name">Hummingbird</span>
+          <span class="tile-meta">Acrylic on Canvas</span>
+        </div>
+      </div>
+      <div class="tile-zoom">⊕</div>
+    </div>
+
+    <div class="tile" data-src="wm_In-plain-sight-web.jpg" data-title="In Plain Sight" data-index="4">
+      <img src="wm_In-plain-sight-web.jpg" alt="In Plain Sight — Hilary Klein">
+      <div class="tile-overlay">
+        <div class="tile-info">
+          <span class="tile-name">In Plain Sight</span>
+          <span class="tile-meta">Acrylic on Canvas</span>
+        </div>
+      </div>
+      <div class="tile-zoom">⊕</div>
+    </div>
+
+    <div class="tile" data-src="painting3.jpg" data-title="Jackrabbit & Marigolds" data-index="5">
+      <img src="painting3.jpg" alt="Jackrabbit & Marigolds — Hilary Klein">
+      <div class="tile-overlay">
+        <div class="tile-info">
+          <span class="tile-name">Jackrabbit & Marigolds</span>
+          <span class="tile-meta">Acrylic on Canvas</span>
+        </div>
+      </div>
+      <div class="tile-zoom">⊕</div>
+    </div>
+
+    <div class="tile" data-src="painting1.jpg" data-title="Bumblebee Heart" data-index="6">
+      <img src="painting1.jpg" alt="Bumblebee Heart — Hilary Klein">
+      <div class="tile-overlay">
+        <div class="tile-info">
+          <span class="tile-name">Bumblebee Heart</span>
+          <span class="tile-meta">Acrylic on Canvas</span>
+        </div>
+      </div>
+      <div class="tile-zoom">⊕</div>
+    </div>
+
+    <div class="tile" data-src="painting2.jpg" data-title="Coyote & Swallowtail" data-index="7">
+      <img src="painting2.jpg" alt="Coyote & Swallowtail — Hilary Klein">
+      <div class="tile-overlay">
+        <div class="tile-info">
+          <span class="tile-name">Coyote & Swallowtail</span>
+          <span class="tile-meta">Acrylic on Canvas</span>
+        </div>
+      </div>
+      <div class="tile-zoom">⊕</div>
+    </div>
+
+  </div>
+
+  <!-- Below gallery text -->
+  <div class="gallery-footer-text">
+    <span class="ornament">✦ ✦ ✦</span>
+    <p>
+      These paintings emerge from long walks in the Gila, from the light that only exists in southwestern New Mexico at dusk, from a deep belief that every creature — from the largest coyote to the smallest beetle — carries its own luminous intelligence.
+    </p>
+    <p>
+      Original works and prints are available. Commissions welcome. Each piece is signed and comes with a certificate of authenticity.
+    </p>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer id="contact">
+  <div class="footer-glow"></div>
+  <div class="footer-main">
+    <p class="footer-label">Get in Touch</p>
+    <h2 class="footer-heading">Let's bring a painting <em>into your world.</em></h2>
+    <p class="footer-body">
+      Interested in a piece, a commission, or just want to say hello?<br>
+      Hilary would love to hear from you.
+    </p>
+    <a href="/cdn-cgi/l/email-protection#1078757c7c7f5078797c7162697b7c75797e3e737f7d" class="footer-email"><span class="__cf_email__" data-cfemail="5038353c3c3f1038393c3122293b3c35393e7e333f3d">[email&#160;protected]</span></a>
+    <div class="footer-divider"></div>
+  </div>
+  <div class="footer-bottom">
+    <span class="footer-sig">Hilary Klein</span>
+    <ul class="footer-nav">
+      <li><a href="#gallery">Gallery</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <span class="footer-copy">© 2024 Hilary Klein. All rights reserved. Silver City, NM.</span>
+  </div>
+</footer>
+
+<!-- ── LIGHTBOX ── -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true">
+  <div class="lightbox-inner">
+    <button class="lightbox-close" id="lb-close" aria-label="Close">✕</button>
+    <button class="lb-prev" id="lb-prev" aria-label="Previous">←</button>
+    <img src="" alt="" id="lb-img">
+    <button class="lb-next" id="lb-next" aria-label="Next">→</button>
+    <span class="lightbox-caption" id="lb-caption"></span>
+  </div>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  // Build image list from tiles
+  const tiles = Array.from(document.querySelectorAll('.tile'));
+  const images = tiles.map(t => ({
+    src: t.dataset.src,
+    title: t.dataset.title
+  }));
+
+  let current = 0;
+  const lb = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lb-img');
+  const lbCap = document.getElementById('lb-caption');
+
+  function openLightbox(index) {
+    current = index;
+    lbImg.src = images[current].src;
+    lbImg.alt = images[current].title;
+    lbCap.textContent = images[current].title;
+    lb.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    lb.classList.remove('active');
+    document.body.style.overflow = '';
+    setTimeout(() => { lbImg.src = ''; }, 400);
+  }
+
+  function showNext() {
+    current = (current + 1) % images.length;
+    lbImg.style.opacity = 0;
+    setTimeout(() => {
+      lbImg.src = images[current].src;
+      lbCap.textContent = images[current].title;
+      lbImg.style.opacity = 1;
+    }, 200);
+  }
+
+  function showPrev() {
+    current = (current - 1 + images.length) % images.length;
+    lbImg.style.opacity = 0;
+    setTimeout(() => {
+      lbImg.src = images[current].src;
+      lbCap.textContent = images[current].title;
+      lbImg.style.opacity = 1;
+    }, 200);
+  }
+
+  // Attach tile clicks
+  tiles.forEach((tile, i) => {
+    tile.addEventListener('click', () => openLightbox(i));
+  });
+
+  document.getElementById('lb-close').addEventListener('click', closeLightbox);
+  document.getElementById('lb-next').addEventListener('click', showNext);
+  document.getElementById('lb-prev').addEventListener('click', showPrev);
+
+  // Close on backdrop click
+  lb.addEventListener('click', e => { if (e.target === lb) closeLightbox(); });
+
+  // Keyboard navigation
+  document.addEventListener('keydown', e => {
+    if (!lb.classList.contains('active')) return;
+    if 
