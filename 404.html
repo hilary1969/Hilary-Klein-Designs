@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>404 — Page Not Found | Hilary Klein Designs</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Cinzel:wght@400;600&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --purple:     #1E0A2E;
+    --purple-mid: #2D1248;
+    --gold:       #F5C400;
+    --cyan:       #00D4C8;
+    --cream:      #FDF6E8;
+  }
+
+  html, body {
+    height: 100%;
+  }
+
+  body {
+    background: var(--purple);
+    color: var(--cream);
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    text-align: center;
+    padding: 2rem;
+    overflow: hidden;
+  }
+
+  /* background glow */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 70vw;
+    height: 70vw;
+    background: radial-gradient(ellipse, rgba(208,2,27,0.12) 0%, transparent 65%);
+    pointer-events: none;
+  }
+
+  /* diagonal stripes */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+      -45deg,
+      transparent 0px,
+      transparent 40px,
+      rgba(245,196,0,0.03) 40px,
+      rgba(245,196,0,0.03) 41px
+    );
+    pointer-events: none;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 600px;
+  }
+
+  .error-number {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(6rem, 20vw, 14rem);
+    line-height: 1;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(245,196,0,0.3);
+    letter-spacing: 0.1em;
+    margin-bottom: 0;
+    animation: fadeIn 1s ease forwards;
+  }
+
+  .animal {
+    font-size: clamp(3rem, 10vw, 6rem);
+    margin: -1rem 0 1rem;
+    animation: float 3s ease-in-out infinite;
+    display: block;
+  }
+
+  .heading {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    color: var(--cream);
+    margin-bottom: 1rem;
+    animation: fadeUp .8s .2s ease both;
+  }
+
+  .heading em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .subtext {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    color: rgba(253,246,232,0.6);
+    line-height: 1.8;
+    margin-bottom: 2.5rem;
+    animation: fadeUp .8s .4s ease both;
+  }
+
+  .btn-home {
+    display: inline-block;
+    padding: 0.9rem 2.8rem;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background .25s, color .25s;
+    animation: fadeUp .8s .6s ease both;
+    margin: 0 0.5rem 1rem;
+    display: inline-block;
+  }
+
+  .btn-home:hover {
+    background: var(--gold);
+    color: var(--purple);
+  }
+
+  .btn-gallery {
+    display: inline-block;
+    padding: 0.9rem 2.8rem;
+    border: 1px solid var(--cyan);
+    color: var(--cyan);
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background .25s, color .25s;
+    animation: fadeUp .8s .7s ease both;
+    margin: 0 0.5rem 1rem;
+    display: inline-block;
+  }
+
+  .btn-gallery:hover {
+    background: var(--cyan);
+    color: var(--purple);
+  }
+
+  .sig {
+    margin-top: 3rem;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1rem;
+    color: rgba(253,246,232,0.2);
+    animation: fadeIn 1s 1s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-12px); }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="error-number">404</div>
+  <span class="animal">🐇</span>
+  <h1 class="heading">This rabbit <em>disappeared</em> into the desert.</h1>
+  <p class="subtext">
+    The page you're looking for has wandered off into the Gila wilderness.<br>
+    Even the jackrabbits couldn't find it.
+  </p>
+  <div>
+    <a href="/" class="btn-home">Back to Home</a>
+    <a href="/#gallery" class="btn-gallery">View the Gallery</a>
+  </div>
+  <p class="sig">Hilary Klein Designs — Silver City, NM</p>
+</div>
+
+</body>
+</html>
