@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Timer</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: #1a1a2e;
+    color: #e0e0f0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem 3rem;
+    user-select: none;
+  }
+  h1 {
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: #7878a0;
+    margin-bottom: 2rem;
+  }
+  .mode-tabs {
+    display: flex;
+    margin-bottom: 2rem;
+    background: #2a2a4a;
+    border-radius: 10px;
+    padding: 4px;
+  }
+  .tab-btn {
+    background: none;
+    border: none;
+    color: #7878a0;
+    padding: 6px 20px;
+    border-radius: 7px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.05em;
+  }
+  .tab-btn.active { background: #6c63ff; color: #fff; }
+  .clock-ring {
+    position: relative;
+    width: 260px;
+    height: 260px;
+    margin-bottom: 2rem;
+  }
+  .clock-ring svg { transform: rotate(-90deg); }
+  .ring-bg { fill: none; stroke: #2a2a4a; stroke-width: 8; }
+  .ring-progress {
+    fill: none;
+    stroke: #6c63ff;
+    stroke-width: 8;
+    stroke-linecap: round;
+    stroke-dasharray: 691;
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 0.5s ease, stroke 0.3s ease;
+  }
+  .ring-progress.warning { stroke: #f0a500; }
+  .ring-progress.urgent { stroke: #e05a5a; }
+  .clock-center {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+  #display {
+    font-size: 48px;
+    font-weight: 300;
+    letter-spacing: 0.04em;
+    color: #e0e0f0;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  #status-label {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #7878a0;
+    margin-top: 6px;
+  }
+  .presets {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .preset-btn {
+    background: #2a2a4a;
+    border: 1px solid #3a3a60;
+    color: #a0a0c8;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+  }
+  .preset-btn:hover { background: #3a3a60; color: #e0e0f0; }
+  .preset-btn.active { background: #6c63ff22; border-color: #6c63ff; color: #a09aff; }
+  .custom-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 2rem;
+  }
+  .time-input {
+    background: #2a2a4a;
+    border: 1px solid #3a3a60;
+    color: #e0e0f0;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 15px;
+    width: 60px;
+    text-align: center;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .time-input:focus { border-color: #6c63ff; }
+  .time-sep { color: #7878a0; font-size: 18px; font-weight: 300; }
+  .set-btn {
+    background: #2a2a4a;
+    border: 1px solid #3a3a60;
+    color: #a0a0c8;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-left: 4px;
+  }
+  .set-btn:hover { background: #3a3a60; color: #e0e0f0; }
+  .controls {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+  .ctrl-btn {
+    background: none;
+    border: 1.5px solid #3a3a60;
+    color: #a0a0c8;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    font-size: 20px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .ctrl-btn:hover { border-color: #6c63ff; color: #a09aff; background: #6c63ff11; }
+  .ctrl-btn.primary {
+    background: #6c63ff;
+    border-color: #6c63ff;
+    color: #fff;
+    width: 64px;
+    height: 64px;
+    font-size: 26px;
+  }
+  .ctrl-btn.primary:hover { background: #7c72ff; }
+  .ctrl-btn.primary:active { transform: scale(0.96); }
+  .ctrl-btn:active { transform: scale(0.94); }
+
+  /* ── Tally / job tracking section ── */
+  #log-panel {
+    display: none;
+    width: 320px;
+    margin-top: 2rem;
+  }
+  #log-panel.show { display: block; }
+
+  .tally-bar {
+    background: #2a2a4a;
+    border: 1px solid #3a3a60;
+    border-radius: 12px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+  .tally-label { font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: #7878a0; }
+  .tally-value { font-size: 22px; font-weight: 300; font-variant-numeric: tabular-nums; color: #a09aff; }
+
+  .log-entry-box {
+    display: none;
+    gap: 8px;
+    margin-bottom: 1rem;
+    align-items: center;
+  }
+  .log-entry-box.show { display: flex; }
+  .log-note-input {
+    flex: 1;
+    background: #2a2a4a;
+    border: 1px solid #6c63ff66;
+    color: #e0e0f0;
+    padding: 7px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .log-note-input:focus { border-color: #6c63ff; }
+  .log-note-input::placeholder { color: #5a5a80; }
+  .log-add-btn {
+    background: #6c63ff;
+    border: none;
+    color: #fff;
+    padding: 7px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s;
+  }
+  .log-add-btn:hover { background: #7c72ff; }
+  .log-skip-btn {
+    background: none;
+    border: 1px solid #3a3a60;
+    color: #7878a0;
+    padding: 7px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .log-skip-btn:hover { background: #2a2a4a; color: #a0a0c8; }
+
+  .session-list {
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  .session-list::-webkit-scrollbar { width: 4px; }
+  .session-list::-webkit-scrollbar-thumb { background: #3a3a60; border-radius: 2px; }
+
+  .session-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 4px;
+    border-bottom: 1px solid #2a2a4a;
+    gap: 8px;
+    animation: fadeIn 0.2s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+  .session-item .s-num { font-size: 11px; color: #5a5a80; min-width: 24px; }
+  .session-item .s-note { font-size: 13px; color: #a0a0c8; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .session-item .s-time { font-size: 13px; color: #7878a0; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .session-item .s-del { background: none; border: none; color: #4a4a70; cursor: pointer; font-size: 15px; padding: 0 4px; transition: color 0.2s; }
+  .session-item .s-del:hover { color: #e05a5a; }
+
+  .log-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+  }
+  .copy-btn, .clear-btn {
+    background: none;
+    border: 1px solid #3a3a60;
+    color: #7878a0;
+    padding: 5px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .copy-btn:hover { border-color: #6c63ff; color: #a09aff; }
+  .clear-btn:hover { border-color: #e05a5a; color: #e05a5a; }
+
+  #alarm-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(26,26,46,0.97);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    animation: pulse-bg 1s infinite alternate;
+    z-index: 100;
+  }
+  #alarm-overlay.show { display: flex; }
+  @keyframes pulse-bg {
+    from { background: rgba(26,26,46,0.97); }
+    to { background: rgba(60,20,20,0.97); }
+  }
+  #alarm-overlay p { font-size: 28px; font-weight: 300; letter-spacing: 0.1em; color: #e05a5a; animation: pulse-text 0.8s infinite alternate; }
+  @keyframes pulse-text { from { opacity: 0.7; } to { opacity: 1; } }
+  .dismiss-btn {
+    background: #e05a5a; border: none; color: #fff;
+    padding: 12px 36px; border-radius: 30px; font-size: 15px;
+    cursor: pointer; transition: background 0.2s;
+  }
+  .dismiss-btn:hover { background: #f07070; }
+</style>
+</head>
+<body>
+
+<h1>Timer</h1>
+
+<div class="mode-tabs">
+  <button class="tab-btn active" onclick="switchMode('timer')">Timer</button>
+  <button class="tab-btn" onclick="switchMode('stopwatch')">Stopwatch</button>
+</div>
+
+<div class="clock-ring">
+  <svg width="260" height="260" viewBox="0 0 260 260">
+    <circle class="ring-bg" cx="130" cy="130" r="110"/>
+    <circle class="ring-progress" id="ring" cx="130" cy="130" r="110"/>
+  </svg>
+  <div class="clock-center">
+    <div id="display">00:00</div>
+    <div id="status-label">ready</div>
+  </div>
+</div>
+
+<div id="timer-controls">
+  <div class="presets">
+    <button class="preset-btn" onclick="setPreset(5*60,this)">5 min</button>
+    <button class="preset-btn" onclick="setPreset(10*60,this)">10 min</button>
+    <button class="preset-btn" onclick="setPreset(25*60,this)">25 min</button>
+    <button class="preset-btn" onclick="setPreset(60*60,this)">1 hr</button>
+  </div>
+  <div class="custom-row">
+    <input class="time-input" id="inp-h" type="number" min="0" max="23" value="0" />
+    <span class="time-sep">:</span>
+    <input class="time-input" id="inp-m" type="number" min="0" max="59" value="5" />
+    <span class="time-sep">:</span>
+    <input class="time-input" id="inp-s" type="number" min="0" max="59" value="0" />
+    <button class="set-btn" onclick="setCustomTime()">Set</button>
+  </div>
+</div>
+
+<div id="stopwatch-controls" style="display:none; height:16px;"></div>
+
+<div class="controls">
+  <button class="ctrl-btn" id="reset-btn" onclick="resetCurrent()" title="Reset session">&#8635;</button>
+  <button class="ctrl-btn primary" id="play-btn" onclick="toggleTimer()">&#9654;</button>
+  <button class="ctrl-btn" id="clear-tally-btn" onclick="clearAll()" title="Clear tally" style="display:none; font-size:14px;">CLR</button>
+</div>
+
+<!-- Job / tally section (stopwatch only) -->
+<div id="log-panel">
+  <div class="tally-bar">
+    <div>
+      <div class="tally-label">Total logged</div>
+      <div class="tally-value" id="tally-display">0:00:00</div>
+    </div>
+    <div style="text-align:right;">
+      <div class="tally-label">Sessions</div>
+      <div class="tally-value" id="session-count">0</div>
+    </div>
+  </div>
+
+  <!-- Appears when stopwatch is paused with time on it -->
+  <div class="log-entry-box" id="log-entry-box">
+    <input class="log-note-input" id="log-note" placeholder="Label (e.g. Prep, Travel, On-site…)" />
+    <button class="log-add-btn" onclick="logSession()">Log it</button>
+    <button class="log-skip-btn" onclick="skipLog()">Skip</button>
+  </div>
+
+  <div class="session-list" id="session-list"></div>
+
+  <div class="log-actions" id="log-actions" style="display:none;">
+    <button class="copy-btn" onclick="copyTally()">&#128203; Copy summary</button>
+    <button class="clear-btn" onclick="clearAll()">&#128465; Clear all</button>
+  </div>
+</div>
+
+<div id="alarm-overlay">
+  <p>&#9200; Time's up!</p>
+  <button class="dismiss-btn" onclick="dismissAlarm()">Dismiss</button>
+</div>
+
+<script>
+  let mode = 'timer';
+  let running = false;
+  let interval = null;
+  let totalSeconds = 5 * 60;
+  let remainingSeconds = 5 * 60;
+  let elapsedMs = 0;
+  let swStartTime = null;
+  let sessions = [];
+  let tallyMs = 0;
+  const CIRC = 2 * Math.PI * 110;
+
+  const display     = document.getElementById('display');
+  const statusLabel = document.getElementById('status-label');
+  const ring        = document.getElementById('ring');
+  const playBtn     = document.getElementById('play-btn');
+  const logPanel    = document.getElementById('log-panel');
+  const logEntryBox = document.getElementById('log-entry-box');
+  const logNote     = document.getElementById('log-note');
+  const sessionList = document.getElementById('session-list');
+  const tallyDisplay= document.getElementById('tally-display');
+  const sessionCount= document.getElementById('session-count');
+  const logActions  = document.getElementById('log-actions');
+  const clearTallyBtn = document.getElementById('clear-tally-btn');
+  const alarmOverlay= document.getElementById('alarm-overlay');
+
+  function switchMode(m) {
+    mode = m;
+    clearInterval(interval);
+    running = false;
+    elapsedMs = 0;
+    playBtn.innerHTML = '&#9654;';
+    document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',(i===0&&m==='timer')||(i===1&&m==='stopwatch')));
+    document.getElementById('timer-controls').style.display = m==='timer'?'':'none';
+    document.getElementById('stopwatch-controls').style.display = m==='stopwatch'?'':'none';
+    logPanel.classList.toggle('show', m==='stopwatch');
+    clearTallyBtn.style.display = m==='stopwatch' ? 'flex' : 'none';
+    logEntryBox.classList.remove('show');
+    setRing(1);
+    if(m==='stopwatch'){
+      display.textContent='00:00.0';
+      statusLabel.textContent='ready';
+    } else {
+      remainingSeconds=totalSeconds;
+      updateTimerDisplay();
+      updateRing();
+    }
+  }
+
+  function setPreset(secs,btn){
+    if(running)return;
+    document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    totalSeconds=secs; remainingSeconds=secs;
+    updateTimerDisplay(); updateRing();
+  }
+
+  function setCustomTime(){
+    if(running)return;
+    const h=parseInt(document.getElementById('inp-h').value)||0;
+    const m=parseInt(document.getElementById('inp-m').value)||0;
+    const s=parseInt(document.getElementById('inp-s').value)||0;
+    const total=h*3600+m*60+s;
+    if(total<=0)return;
+    document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));
+    totalSeconds=total; remainingSeconds=total;
+    updateTimerDisplay(); updateRing();
+  }
+
+  function toggleTimer(){
+    if(mode==='timer'){
+      if(remainingSeconds<=0){resetCurrent();return;}
+      running=!running;
+      if(running){
+        playBtn.innerHTML='&#9646;&#9646;';
+        statusLabel.textContent='running';
+        interval=setInterval(tickTimer,1000);
+        logEntryBox.classList.remove('show');
+      } else {
+        clearInterval(interval);
+        playBtn.innerHTML='&#9654;';
+        statusLabel.textContent='paused';
+      }
+    } else {
+      running=!running;
+      if(running){
+        swStartTime=performance.now()-elapsedMs;
+        playBtn.innerHTML='&#9646;&#9646;';
+        statusLabel.textContent='running';
+        interval=setInterval(tickSW,50);
+        logEntryBox.classList.remove('show');
+      } else {
+        clearInterval(interval);
+        playBtn.innerHTML='&#9654;';
+        statusLabel.textContent='paused';
+        if(elapsedMs > 500) {
+          logEntryBox.classList.add('show');
+          setTimeout(()=>logNote.focus(),50);
+        }
+      }
+    }
+  }
+
+  function tickTimer(){
+    remainingSeconds--;
+    updateTimerDisplay(); updateRing();
+    if(remainingSeconds<=0){
+      clearInterval(interval); running=false;
+      playBtn.innerHTML='&#9654;';
+      triggerAlarm();
+    }
+  }
+
+  function tickSW(){
+    elapsedMs=performance.now()-swStartTime;
+    updateSWDisplay(elapsedMs);
+  }
+
+  function resetCurrent(){
+    clearInterval(interval);
+    running=false;
+    playBtn.innerHTML='&#9654;';
+    logEntryBox.classList.remove('show');
+    if(mode==='timer'){
+      remainingSeconds=totalSeconds;
+      updateTimerDisplay(); updateRing();
+      statusLabel.textContent='ready';
+    } else {
+      elapsedMs=0;
+      display.textContent='00:00.0';
+      statusLabel.textContent='ready';
+      setRing(1);
+    }
+  }
+
+  function logSession(){
+    if(elapsedMs < 500) { skipLog(); return; }
+    const note = logNote.value.trim() || 'Session ' + (sessions.length+1);
+    const ms = elapsedMs;
+    tallyMs += ms;
+    sessions.push({note, ms, time: new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})});
+    renderSessions();
+    updateTally();
+    logNote.value='';
+    logEntryBox.classList.remove('show');
+    elapsedMs=0;
+    display.textContent='00:00.0';
+    statusLabel.textContent='logged ✓';
+    setRing(1);
+    setTimeout(()=>{ if(!running) statusLabel.textContent='ready'; },1200);
+  }
+
+  function skipLog(){
+    logEntryBox.classList.remove('show');
+    elapsedMs=0;
+    display.textContent='00:00.0';
+    statusLabel.textContent='ready';
+    setRing(1);
+  }
+
+  function renderSessions(){
+    sessionList.innerHTML='';
+    sessions.forEach((s,i)=>{
+      const el=document.createElement('div');
+      el.className='session-item';
+      el.innerHTML=`<span class="s-num">${i+1}</span><span class="s-note" title="${s.note}">${s.note}</span><span class="s-time">${formatMs(s.ms)}</span><button class="s-del" onclick="deleteSession(${i})" title="Remove">&#215;</button>`;
+      sessionList.appendChild(el);
+    });
+    logActions.style.display=sessions.length>0?'flex':'none';
+    sessionCount.textContent=sessions.length;
+  }
+
+  function deleteSession(i){
+    tallyMs -= sessions[i].ms;
+    sessions.splice(i,1);
+    renderSessions();
+    updateTally();
+  }
+
+  function updateTally(){
+    tallyDisplay.textContent = formatMs(tallyMs, true);
+  }
+
+  function clearAll(){
+    if(sessions.length===0 && tallyMs===0) return;
+    if(!confirm('Clear all logged sessions?')) return;
+    sessions=[]; tallyMs=0;
+    renderSessions(); updateTally();
+    resetCurrent();
+  }
+
+  function copyTally(){
+    if(sessions.length===0) return;
+    let lines = ['Job Time Summary', '================'];
+    sessions.forEach((s,i)=> lines.push(`${i+1}. ${s.note.padEnd(28)} ${formatMs(s.ms)}`));
+    lines.push('', `Total: ${formatMs(tallyMs, true)}`);
+    navigator.clipboard.writeText(lines.join('\n')).then(()=>{
+      const btn=document.querySelector('.copy-btn');
+      btn.textContent='✓ Copied!';
+      setTimeout(()=>btn.innerHTML='&#128203; Copy summary',1500);
+    });
+  }
+
+  function formatMs(ms, long=false){
+    const totalSec=Math.floor(ms/1000);
+    const h=Math.floor(totalSec/3600);
+    const m=Math.floor((totalSec%3600)/60);
+    const s=totalSec%60;
+    if(long || h>0) return `${h}:${pad(m)}:${pad(s)}`;
+    return `${pad(m)}:${pad(s)}`;
+  }
+
+  function updateSWDisplay(ms){
+    const totalSec=Math.floor(ms/1000);
+    const m=Math.floor(totalSec/60);
+    const s=totalSec%60;
+    const tenths=Math.floor((ms%1000)/100);
+    if(m>=60){
+      const h=Math.floor(m/60);
+      display.textContent=pad(h)+':'+pad(m%60)+':'+pad(s);
+    } else {
+      display.textContent=pad(m)+':'+pad(s)+'.'+tenths;
+    }
+  }
+
+  function updateTimerDisplay(){
+    const h=Math.floor(remainingSeconds/3600);
+    const m=Math.floor((remainingSeconds%3600)/60);
+    const s=remainingSeconds%60;
+    display.textContent=h>0 ? pad(h)+':'+pad(m)+':'+pad(s) : pad(m)+':'+pad(s);
+    ring.classList.toggle('warning',remainingSeconds<=totalSeconds*.25&&remainingSeconds>totalSeconds*.1);
+    ring.classList.toggle('urgent',remainingSeconds<=totalSeconds*.1);
+  }
+
+  function updateRing(){
+    setRing(totalSeconds>0?remainingSeconds/totalSeconds:1);
+  }
+
+  function setRing(pct){
+    ring.style.strokeDashoffset=CIRC*(1-pct);
+  }
+
+  function pad(n){ return String(n).padStart(2,'0'); }
+
+  function triggerAlarm(){
+    statusLabel.textContent='done!';
+    alarmOverlay.classList.add('show');
+    playBeep();
+  }
+
+  function dismissAlarm(){
+    alarmOverlay.classList.remove('show');
+    resetCurrent();
+  }
+
+  function playBeep(){
+    try {
+      const ctx=new(window.AudioContext||window.webkitAudioContext)();
+      [0,.3,.6,.9,1.2].forEach(t=>{
+        const osc=ctx.createOscillator(), gain=ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.frequency.value=880; osc.type='sine';
+        gain.gain.setValueAtTime(0,ctx.currentTime+t);
+        gain.gain.linearRampToValueAtTime(0.4,ctx.currentTime+t+.05);
+        gain.gain.linearRampToValueAtTime(0,ctx.currentTime+t+.25);
+        osc.start(ctx.currentTime+t); osc.stop(ctx.currentTime+t+.3);
+      });
+    } catch(e){}
+  }
+
+  logNote.addEventListener('keydown', e => { if(e.key==='Enter') logSession(); });
+  updateTimerDisplay();
+  updateRing();
+</script>
+</body>
+</html>
